@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const ejs = require('ejs');
 
 const app = express();
-const port = 3000;
+const port = 8000;
 const Photo = require('./models/Photo');
 
 // Connect DB
