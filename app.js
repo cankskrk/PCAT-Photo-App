@@ -1,10 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const ejs = require('ejs');
+const fileUpload = require('express-fileupload');
 
 const app = express();
 const port = 8000;
 const Photo = require('./models/Photo');
+const fs = require('fs');
 
 // Connect DB
 mongoose.connect('mongodb://127.0.0.1/pcat-db');
@@ -16,6 +18,7 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(fileUpload());
 
 // Routes
 app.get('/', async (req, res) => {
@@ -40,8 +43,17 @@ app.get('/photos/:id', async (req, res) => {
   });
 }); // Parametre ismi farketmiyor ama calismamiza uygun olmasi icin 'id' ismini verdik.
 
-app.post('/photos', async (req, res) => {
-  await Photo.create(req.body);
+app.post('/photos', (req, res) => {
+  const uploadedPhotoDir = '/public/upload/';
+  let uploadedImage = req.files.image;
+  let uploadedImagePath = __dirname + uploadedPhotoDir + uploadedImage.name;
+  console.log(uploadedImagePath);
+
+  if (!fs.existsSync(uploadedPhotoDir)) {
+    // fs.mkdir(uploadedPhotoDir);
+    console.log('Yok!');
+  }
+
   res.redirect('/');
 });
 
