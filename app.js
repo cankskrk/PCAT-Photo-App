@@ -44,15 +44,20 @@ app.get('/photos/:id', async (req, res) => {
 }); // Parametre ismi farketmiyor ama calismamiza uygun olmasi icin 'id' ismini verdik.
 
 app.post('/photos', (req, res) => {
-  const uploadedPhotoDir = '/public/upload/';
+  const uploadedPhotoDir = 'public/uploads/';
   let uploadedImage = req.files.image;
-  let uploadedImagePath = __dirname + uploadedPhotoDir + uploadedImage.name;
-  console.log(uploadedImagePath);
+  let uploadedImagePath = __dirname + '/public/uploads/' + uploadedImage.name;
 
   if (!fs.existsSync(uploadedPhotoDir)) {
-    // fs.mkdir(uploadedPhotoDir);
-    console.log('Yok!');
+    fs.mkdirSync('public/uploads/');
   }
+
+  uploadedImage.mv(uploadedImagePath, async () => {
+    await Photo.create({
+      ...req.body,
+      image: `/uploads/${uploadedImage.name}`,
+    });
+  });
 
   res.redirect('/');
 });
