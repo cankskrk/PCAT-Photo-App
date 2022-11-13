@@ -5,7 +5,7 @@ const fileUpload = require('express-fileupload');
 const methodOverride = require('method-override');
 
 const app = express();
-const port = 8000;
+const port = 3000;
 const Photo = require('./models/Photo');
 const fs = require('fs');
 
@@ -20,7 +20,11 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(fileUpload());
-app.use(methodOverride('_method')); // Bazı tarayıcılarda PUT ve DELETE metodları çalışmıyor dolayısıyla bu gibi paketleri kullanıyoruz.
+app.use(
+  methodOverride('_method', {
+    methods: ['POST', 'GET'], // Delete metodunda sorun yasadik delete metodunu get metodunun ustune yazamadigi icin ayni sayfada donup duruyor.
+  })
+); // Bazı tarayıcılarda PUT ve DELETE metodları çalışmıyor dolayısıyla bu gibi paketleri kullanıyoruz.
 
 // Routes
 app.get('/', async (req, res) => {
@@ -79,6 +83,16 @@ app.put('/photos/:id', async (req, res) => {
   await photo.save();
 
   res.redirect(`/photos/${req.params.id}`);
+});
+
+app.delete('/photos/:id', async (req, res) => {
+  const photo = await Photo.findOne({ _id: req.params.id });
+  let deletedImagePath = __dirname + '/public/uploads/' + photo.image;
+  if (fs.existsSync(deletedImagePath)) {
+    fs.unlinkSync(deletedImagePath);
+  }
+  await Photo.findByIdAndRemove(req.params.id);
+  res.redirect('/');
 });
 
 // Listening PORT
