@@ -6,8 +6,8 @@ const methodOverride = require('method-override');
 
 const app = express();
 const port = 3000;
-const Photo = require('./models/Photo');
-const fs = require('fs');
+const photoController = require('./controllers/photoController');
+const pageController = require('./controllers/pageController');
 
 // Connect DB
 mongoose.connect('mongodb://127.0.0.1/pcat-db');
@@ -27,73 +27,15 @@ app.use(
 ); // Bazı tarayıcılarda PUT ve DELETE metodları çalışmıyor dolayısıyla bu gibi paketleri kullanıyoruz.
 
 // Routes
-app.get('/', async (req, res) => {
-  const photos = await Photo.find({}).sort('-dateCreated'); // Oluşturulma tarihine göre sıraladık. "-" nin amacı en son oluşturulanın ilk başa geçmesini sağlamaktır.
-  res.render('index', {
-    photos, // photos: photos seklinde yazmaya gerek yok.
-  });
-});
+app.get('/', photoController.getAllPhotos);
+app.get('/photos/:id', photoController.getPhoto); // Parametre ismi farketmiyor ama calismamiza uygun olmasi icin 'id' ismini verdik.
+app.post('/photos', photoController.createPhoto);
+app.put('/photos/:id', photoController.updatePhoto);
+app.delete('/photos/:id', photoController.deletePhoto);
 
-app.get('/about', (req, res) => {
-  res.render('about');
-});
-
-app.get('/add', (req, res) => {
-  res.render('add');
-});
-
-app.get('/photos/:id', async (req, res) => {
-  const photo = await Photo.findById(req.params.id);
-  res.render('photo', {
-    photo,
-  });
-}); // Parametre ismi farketmiyor ama calismamiza uygun olmasi icin 'id' ismini verdik.
-
-app.get('/photo/edit/:id', async (req, res) => {
-  const photo = await Photo.findOne({ _id: req.params.id });
-  res.render('edit', {
-    photo,
-  });
-});
-
-app.post('/photos', (req, res) => {
-  const uploadedPhotoDir = 'public/uploads/'; // Sorgu için.
-  let uploadedImage = req.files.image;
-  let uploadedImagePath = __dirname + '/public/uploads/' + uploadedImage.name;
-
-  if (!fs.existsSync(uploadedPhotoDir)) {
-    // Senkron yapmamızın sebebi önemli olması kontrol yaptıktan sonra diğer işleme geçmesi gerek.
-    fs.mkdirSync('public/uploads/');
-  }
-
-  uploadedImage.mv(uploadedImagePath, async () => {
-    await Photo.create({
-      ...req.body,
-      image: `/uploads/${uploadedImage.name}`,
-    });
-  });
-
-  res.redirect('/');
-});
-
-app.put('/photos/:id', async (req, res) => {
-  const photo = await Photo.findOne({ _id: req.params.id });
-  photo.title = req.body.title;
-  photo.description = req.body.description;
-  await photo.save();
-
-  res.redirect(`/photos/${req.params.id}`);
-});
-
-app.delete('/photos/:id', async (req, res) => {
-  const photo = await Photo.findOne({ _id: req.params.id });
-  let deletedImagePath = __dirname + '/public/uploads/' + photo.image;
-  if (fs.existsSync(deletedImagePath)) {
-    fs.unlinkSync(deletedImagePath);
-  }
-  await Photo.findByIdAndRemove(req.params.id);
-  res.redirect('/');
-});
+app.get('/about', pageController.getAboutPage);
+app.get('/add', pageController.getAddPage);
+app.get('/photos/edit/:id', pageController.getEditPage);
 
 // Listening PORT
 app.listen(port, () => {
