@@ -47,7 +47,7 @@ exports.updatePhoto = async (req, res) => {
 
 exports.deletePhoto = async (req, res) => {
   const photo = await Photo.findOne({ _id: req.params.id });
-  let deletedImagePath = __dirname + '/../public/uploads/' + photo.image; // MVC duzenlemesinden dolayi dosya dizini degisti o yuzdenn '..' kullandik.
+  let deletedImagePath = __dirname + '/../public/' + photo.image; // MVC duzenlemesinden dolayi dosya dizini degisti o yuzdenn '..' kullandik.
   if (fs.existsSync(deletedImagePath)) {
     fs.unlinkSync(deletedImagePath);
   }
