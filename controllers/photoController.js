@@ -16,6 +16,7 @@ exports.getPhoto = async (req, res) => {
 };
 
 exports.createPhoto = (req, res) => {
+  // Fotograf yolunu veritabanina aktarma ve uploads dosyasina gelen jpg dosyalarini koyma.
   const uploadedPhotoDir = 'public/uploads/'; // Sorgu için.
   let uploadedImage = req.files.image;
   let uploadedImagePath =
