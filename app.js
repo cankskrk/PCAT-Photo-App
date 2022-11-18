@@ -3,14 +3,27 @@ const mongoose = require('mongoose');
 const ejs = require('ejs');
 const fileUpload = require('express-fileupload');
 const methodOverride = require('method-override');
+require('dotenv').config();
 
 const app = express();
-const port = 3000;
 const photoController = require('./controllers/photoController');
 const pageController = require('./controllers/pageController');
 
 // Connect DB
-mongoose.connect('mongodb://127.0.0.1/pcat-db');
+mongoose
+  .connect(
+    `mongodb+srv://${process.env.USER_ID}:${process.env.USER_KEY}@cluster0.jbsxgf3.mongodb.net/pcat-db?retryWrites=true&w=majority`,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
+  .then(() => {
+    console.log('DB Connected!');
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 // Template Engine
 app.set('view engine', 'ejs');
@@ -38,6 +51,8 @@ app.get('/add', pageController.getAddPage);
 app.get('/photos/edit/:id', pageController.getEditPage);
 
 // Listening PORT
+const port = process.env.PORT || 5000;
+
 app.listen(port, () => {
   console.log(`Server is running on PORT ${port}...`);
 });
