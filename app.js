@@ -12,7 +12,7 @@ const pageController = require('./controllers/pageController');
 // Connect DB
 mongoose
   .connect(
-    `mongodb+srv://${process.env.USER_ID}:${process.env.USER_KEY}@cluster0.jbsxgf3.mongodb.net/pcat-db?retryWrites=true&w=majority`,
+    `mongodb+srv://${process.env.USER_ID}:${process.env.USER_KEY}@cluster0.jbsxgf3.mongodb.net/?retryWrites=true&w=majority`,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
