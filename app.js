@@ -11,10 +11,13 @@ const pageController = require('./controllers/pageController');
 
 // Connect DB
 mongoose
-  .connect(`mongodb://127.0.0.1:27017`, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(
+    `mongodb+srv://${process.env.USER_ID}:${process.env.USER_KEY}@cluster0.jbsxgf3.mongodb.net/?retryWrites=true&w=majority`,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
   .then(() => {
     console.log('DB Connected!');
   })
