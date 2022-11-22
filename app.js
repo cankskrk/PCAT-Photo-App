@@ -11,7 +11,7 @@ const pageController = require('./controllers/pageController');
 
 // Connect DB
 mongoose
-  .connect(`mongodb://127.0.0.1:27017`, {
+  .connect(`mongodb://127.0.0.1:27017/pcat-db`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
